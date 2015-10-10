@@ -41,8 +41,9 @@
             var canvasHeight = window.innerHeight;
 
             // Set the renderers size to the content areas size
-            self.renderer.setSize(canvasWidth, canvasHeight);
 
+            self.renderer.setSize(canvasWidth, canvasHeight);
+            self.renderer.shadowMapEnabled = true;
             // Get the DIV element from the HTML document by its ID and append the renderers DOM
             // object to it
             document.getElementById("WebGLCanvas").appendChild(self.renderer.domElement);
@@ -50,7 +51,10 @@
             // Create the scene, in which all objects are stored (e. g. camera, lights,
             // geometries, ...)
             self.scene = new THREE.Scene();
-
+            var spotLight = new THREE.SpotLight( 0xffffff );
+            spotLight.castShadow = true;
+            spotLight.position.set( 40, 60, 20 );
+            self.scene.add(spotLight );
             self.camera = new THREE.PerspectiveCamera(45, canvasWidth / canvasHeight, 1, 100);
             var controls = new THREE.OrbitControls( self.camera );
             self.camera.position.set(0, 4, 15);

@@ -25,6 +25,55 @@
             return triangleMesh;
         };
 
+        self.createPlane = function (x, y, width, height, color, textureUrl) {
+                // The creation of the square is done in the same way as the triangle, except that we
+                // now need two THREE.Face3s.
+                // 1. Instantiate the geometry object
+                // 2. Add the vertices
+                // 3. Define the faces by setting the vertices indices
+                var squareGeometry = new THREE.PlaneGeometry(width,height,1,1);
+                var texture = new THREE.ImageUtils.loadTexture(textureUrl);
+            texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
+
+                /*squareGeometry.vertices.push(new THREE.Vector3(-0.6 / div, 0.6 / div, 0.0));
+                 squareGeometry.vertices.push(new THREE.Vector3(0.6 / div, 0.6 / div, 0.0));
+                 squareGeometry.vertices.push(new THREE.Vector3(0.6 / div, -0.6 / div, 0.0));
+                 squareGeometry.vertices.push(new THREE.Vector3(-0.6 / div, -0.6 / div, 0.0));
+                 squareGeometry.faces.push(new THREE.Face3(0, 1, 2));
+                 squareGeometry.faces.push(new THREE.Face3(0, 2, 3));
+
+                 var squareMaterial = {};
+                 if(textureUrl) {
+                 var texture = new THREE.ImageUtils.loadTexture(textureUrl);
+                 texture.repeat.x = 10;
+                 texture.repeat.y = 10;
+                 squareMaterial = new THREE.MeshBasicMaterial({
+                 map: texture,
+                 side:THREE.DoubleSide
+                 });
+                 }
+                 else {
+                 squareMaterial= new THREE.MeshBasicMaterial({
+                 color: color,
+                 side: THREE.DoubleSide
+                 });
+                 }
+
+                 // Create a mesh and insert the geometry and the material. Translate the whole mesh
+                 // by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
+                 var squareMesh = new THREE.Mesh(squareGeometry, squareMaterial);
+                 squareMesh.position.set(x, y, 1.0);
+                 return squareMesh;*/
+                var planeMaterial = new THREE.MeshLambertMaterial({map: texture, side: THREE.DoubleSide});
+                var plane = new THREE.Mesh(squareGeometry,planeMaterial);
+            plane.rotateX(3.15);
+                plane.position.x = x;
+                plane.position.y = y;
+                plane.position.z = z;
+            plane.castShadow = true;
+                return plane;
+
+        };
         self.createSquare = function (x, y, div, color) {
             div = div || 1;
             // The creation of the square is done in the same way as the triangle, except that we
@@ -33,6 +82,8 @@
             // 2. Add the vertices
             // 3. Define the faces by setting the vertices indices
             var squareGeometry = new THREE.Geometry();
+
+
             squareGeometry.vertices.push(new THREE.Vector3(-0.6 / div, 0.6 / div, 0.0));
             squareGeometry.vertices.push(new THREE.Vector3(0.6 / div, 0.6 / div, 0.0));
             squareGeometry.vertices.push(new THREE.Vector3(0.6 / div, -0.6 / div, 0.0));
@@ -91,14 +142,14 @@
             return circle
         };
 
-        self.createPyramid = function (x, y, z, color, radiusTop,radiusBottom, height,radialSegments, heightSegments) {
+        self.createPyramid = function (x, y, z, color, textureUrl,radiusTop, radiusBottom, height, radialSegments, heightSegments) {
             radiusTop = radiusTop || 0;
-            radiusBottom= radiusBottom || 1.5;
+            radiusBottom = radiusBottom || 1.5;
             height = height || 1.5;
             radialSegments = radialSegments || 4;
             heightSegments = heightSegments || false;
 
-            var pyramidGeometry = new THREE.CylinderGeometry(radiusTop,radiusBottom, height,radialSegments, heightSegments);
+            var pyramidGeometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments);
 
             // Coloring the faces with vertex colors is a bit tricky, but allows us to see how to
             // loop through the faces and check whether they have three or four vertices.
@@ -139,50 +190,92 @@
             // rendered (backface culling). But this performance optimization sometimes leads
             // to wholes in the surface. When this happens in your surface, simply set
             // 'doubleSided' to 'true'.
-            var pyramidMaterial = new THREE.MeshBasicMaterial({
-                vertexColors: color,
-                side: THREE.DoubleSide
-            });
+            var pyramidMaterial = {};
+            if (textureUrl) {
+                var texture = new THREE.ImageUtils.loadTexture(textureUrl);
+                pyramidMaterial = new THREE.MeshLambertMaterial({
+                        map: texture,
+                        side: THREE.DoubleSide
+                    }
+                );
+            }
+            else {
+                pyramidMaterial = new THREE.MeshLambertMaterial({
+                    vertexColors: color,
+                    side: THREE.DoubleSide
+                });
+            }
 
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
             // by -1.5 on the x axis and by 4 on the z axis. Finally add the mesh to the scene.
             var pyramidMesh = new THREE.Mesh(pyramidGeometry, pyramidMaterial);
             pyramidMesh.position.set(x, y, z);
             pyramidMesh.rotateY(0.75);
+            pyramidMesh.castShadow = true;
             return pyramidMesh;
         };
 
-        self.createCube = function (x, y, z, width, color) {
+        self.createCube = function (x, y, z, width, color, textureUrl) {
             var boxGeometry = new THREE.BoxGeometry(width, width, width);
 
-            var boxMaterials = [
-                new THREE.MeshBasicMaterial({color: color}),
-                new THREE.MeshBasicMaterial({color: 0xD9C400}),
-                new THREE.MeshBasicMaterial({color: 0xD9A4B0}),
-                new THREE.MeshBasicMaterial({color: 0xE9C4B0}),
-                new THREE.MeshBasicMaterial({color: 0x5905B0}),
-                new THREE.MeshBasicMaterial({color: color})
-            ];
-
-            // Create a MeshFaceMaterial, which allows the cube to have different materials on
-            // each face
-            var boxMaterial = new THREE.MeshFaceMaterial(boxMaterials);
-
+            var boxMaterial = {};
+            if (textureUrl) {
+                var texture = new THREE.ImageUtils.loadTexture(textureUrl);
+                boxMaterial = new THREE.MeshLambertMaterial({
+                        map: texture,
+                        side: THREE.DoubleSide
+                    }
+                );
+            }
+            else {
+                var boxMaterials = [
+                    new THREE.MeshBasicMaterial({color: color}),
+                    new THREE.MeshBasicMaterial({color: 0xD9C400}),
+                    new THREE.MeshBasicMaterial({color: 0xD9A4B0}),
+                    new THREE.MeshBasicMaterial({color: 0xE9C4B0}),
+                    new THREE.MeshBasicMaterial({color: 0x5905B0}),
+                    new THREE.MeshBasicMaterial({color: color})
+                ];
+                boxMaterial = new THREE.MeshBasicMaterial(boxMaterials);
+            }
             // Create a mesh and insert the geometry and the material. Translate the whole mesh
             // by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
             var boxMesh = new THREE.Mesh(boxGeometry, boxMaterial);
             boxMesh.position.set(x, y, z);
+            boxMesh.castShadow = true;
             return boxMesh;
         };
 
-        self.createSphere = function(radius, x, y, z, color, n) {
-            var geometry = new THREE.SphereGeometry(radius, n || 100, n|| 100);
-            var material = new THREE.MeshBasicMaterial( {color: color} );
-            var sphere = new THREE.Mesh( geometry, material );
+        self.createSphere = function (radius, x, y, z, color, n, textureUrl) {
+            var geometry = new THREE.SphereGeometry(radius, n || 100, n || 100);
+            var material = {};
+            if (textureUrl) {
+                var texture = new THREE.ImageUtils.loadTexture(textureUrl);
+                if(textureUrl == './textures/sun-texture.jpg'){
+                    material = new THREE.MeshBasicMaterial({
+                            map: texture,
+                            side: THREE.DoubleSide
+                        }
+                    );
+                }
+                else{
+                material = new THREE.MeshLambertMaterial({
+                        map: texture,
+                        side: THREE.DoubleSide
+                    }
+                );}
+
+            }
+            else {
+                material = new THREE.MeshLambertMaterial({color: color});
+            }
+
+            var sphere = new THREE.Mesh(geometry, material);
             debugger;
             sphere.position.z = z;
             sphere.position.x = x;
             sphere.position.y = y;
+            sphere.castShadow = true;
             return sphere;
         };
         return self;

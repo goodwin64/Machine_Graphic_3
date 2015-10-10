@@ -11,6 +11,17 @@
         one: 83,
         two: 87
     };
+    var TEXTURE_URLS = {
+        grassTextureUrl: './textures/grass-texture.jpg',
+        treeTextureUrl: './textures/tree-texture.jpg',
+        roofTextureUrl: './textures/roof-texture.jpg',
+        starTextureUrl: './textures/star-texture.jpg',
+        sunTextureUrl: './textures/sun-texture.jpg',
+        weaponTextureUrl: './textures/weapon-texture.jpg',
+        blackHoleTextureUrl: './textures/blackHole-texture.jpg',
+        doorTextureUrl: './textures/door-texture.jpg',
+        windowTextureUrl: './textures/window-texture.jpg'
+    };
     var UFO_RADIUS = 1;
     var self = {};
 
@@ -36,18 +47,20 @@
     };
 
     var initializeHouse = function () {
-        self.grass = self.figureCreator.createSquare(1, -2.8, 0.05, 0x30963F);
+        self.grass = self.figureCreator.createPlane(1, -2.8, 20, 20, 0xffffff, TEXTURE_URLS.grassTextureUrl);
         self.grass.rotateX(1.57);
-        self.house.window = self.figureCreator.createSquare(-1.6, -2, 2.5, 0x1121F9);
+        self.grass.castShadow = false;
+        self.grass.receiveShadow = true;
+        self.house.window = self.figureCreator.createPlane(-1.6, -2,0.5,0.5, 0x1121F9, TEXTURE_URLS.windowTextureUrl);
         self.house.window.position.z = 1.76;
-        self.house.door = self.figureCreator.createDoor(-2.26, -2.5, 2.5, 0xff0000);
-        self.house.door.position.z = 1.4;
-        self.house.door.rotateY(1.57);
-        self.house.window1 = self.figureCreator.createSquare(-0.73, -1.9, 2.5, 0x00aa00);
+        self.house.door = self.figureCreator.createPlane(-0.74, -2.27,0.6, 1, 0xff0000, TEXTURE_URLS.doorTextureUrl);
+        self.house.door.position.z = 0.7;
+        self.house.door.rotateY(-1.575);
+        self.house.window1 = self.figureCreator.createPlane(-0.73, -1.9, 0.5,0.5, 0x00aa00,TEXTURE_URLS.windowTextureUrl);
         self.house.window1.rotateY(1.57);
         self.house.window1.position.z = 1.4;
-        self.house.roof = self.figureCreator.createPyramid(-1.46, -0.75, 1, 0x7D460F);
-        self.house.body = self.figureCreator.createCube(-1.5, -2, 1, 1.5, 0xD9C4B0);
+        self.house.roof = self.figureCreator.createPyramid(-1.46, -0.6, 1, 0x7D460F, TEXTURE_URLS.roofTextureUrl);
+        self.house.body = self.figureCreator.createCube(-1.5, -2, 1, 1.5, 0xD9C4B0  , TEXTURE_URLS.treeTextureUrl);
 
         self.sceneRenderer.addFigureToScene(self.house.body);
         self.sceneRenderer.addFigureToScene(self.house.roof);
@@ -58,14 +71,16 @@
         self.sceneRenderer.addFigureToScene(self.grass);
     };
     var initializeUFO = function () {
-        self.UFO.body = self.figureCreator.createSphere(UFO_RADIUS, -6, 3, 1.1, 0xd3d3d3, 32);
-        self.UFO.roof = self.figureCreator.createSphere(UFO_RADIUS/5, -6, 3, 2.1, 0x100000,32);
-
+        self.UFO.body = self.figureCreator.createSphere(UFO_RADIUS, -6, 3, 1.1, 0xd3d3d3, 32, TEXTURE_URLS.starTextureUrl);
+        self.UFO.roof = self.figureCreator.createSphere(UFO_RADIUS/5, -6, 3, 2.1, 0x100000,32, TEXTURE_URLS.weaponTextureUrl);
+        self.UFO.roof.rotateY(-1.55);
         self.sceneRenderer.addFigureToScene(self.UFO.roof);
         self.sceneRenderer.addFigureToScene(self.UFO.body);
 
-        self.sun = self.figureCreator.createSphere(1, 3, 4, 6, 0xffff30, 10);
+        self.sun = self.figureCreator.createSphere(1.2, 3, 4, 6, 0xffff30, 32,TEXTURE_URLS.sunTextureUrl);
+        self.sun.castShadow = false;
         self.sceneRenderer.addFigureToScene(self.sun);
+
         requestAnimationFrame(updateCoords);
     };
 
@@ -73,7 +88,8 @@
         if (!self.UFO.blackHole) {
             self.UFO.blackHole = self.figureCreator.createSphere(1.5
                 , self.UFO.body.position.x, self.UFO.body.position.y - 3 * UFO_RADIUS,
-                self.UFO.body.position.z, 0x000000);
+                self.UFO.body.position.z, 0x000000, 100, TEXTURE_URLS.blackHoleTextureUrl);
+            self.UFO.blackHole.castShadow = false;
             self.sceneRenderer.addFigureToScene(self.UFO.blackHole);
         }
         else {
@@ -85,8 +101,13 @@
     };
 
     function updateCoords() {
-        self.sun.rotateZ(0.1);
-        self.sun.rotateY(0.1);
+        if(self.sun) {
+            self.sun.rotateY(0.1);
+        }
+        if(self.UFO.blackHole)
+        {
+            self.UFO.blackHole.rotateY(0.5);
+        }
         attractObject();
         self.sceneRenderer.renderScene();
 
