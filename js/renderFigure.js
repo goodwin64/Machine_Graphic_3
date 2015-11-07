@@ -35,35 +35,6 @@
                 var texture = new THREE.ImageUtils.loadTexture(textureUrl);
             texture.wrapS = texture.wrapT = THREE.RepeatWrapping;
 
-                /*squareGeometry.vertices.push(new THREE.Vector3(-0.6 / div, 0.6 / div, 0.0));
-                 squareGeometry.vertices.push(new THREE.Vector3(0.6 / div, 0.6 / div, 0.0));
-                 squareGeometry.vertices.push(new THREE.Vector3(0.6 / div, -0.6 / div, 0.0));
-                 squareGeometry.vertices.push(new THREE.Vector3(-0.6 / div, -0.6 / div, 0.0));
-                 squareGeometry.faces.push(new THREE.Face3(0, 1, 2));
-                 squareGeometry.faces.push(new THREE.Face3(0, 2, 3));
-
-                 var squareMaterial = {};
-                 if(textureUrl) {
-                 var texture = new THREE.ImageUtils.loadTexture(textureUrl);
-                 texture.repeat.x = 10;
-                 texture.repeat.y = 10;
-                 squareMaterial = new THREE.MeshBasicMaterial({
-                 map: texture,
-                 side:THREE.DoubleSide
-                 });
-                 }
-                 else {
-                 squareMaterial= new THREE.MeshBasicMaterial({
-                 color: color,
-                 side: THREE.DoubleSide
-                 });
-                 }
-
-                 // Create a mesh and insert the geometry and the material. Translate the whole mesh
-                 // by 1.5 on the x axis and by 4 on the z axis and add the mesh to the scene.
-                 var squareMesh = new THREE.Mesh(squareGeometry, squareMaterial);
-                 squareMesh.position.set(x, y, 1.0);
-                 return squareMesh;*/
                 var planeMaterial = new THREE.MeshLambertMaterial({map: texture, side: THREE.DoubleSide});
                 var plane = new THREE.Mesh(squareGeometry,planeMaterial);
             plane.rotateX(3.15);
@@ -74,6 +45,7 @@
                 return plane;
 
         };
+
         self.createSquare = function (x, y, div, color) {
             div = div || 1;
             // The creation of the square is done in the same way as the triangle, except that we
@@ -140,6 +112,33 @@
             circle.position.y = y;
             circle.position.z = z;
             return circle
+        };
+
+        self.createCylinder = function (x, y, z, color, textureUrl,radiusTop, radiusBottom, height, radialSegments, heightSegments) {
+
+            var cylinderGeometry = new THREE.CylinderGeometry(radiusTop, radiusBottom, height, radialSegments, heightSegments);
+
+            var cylinderMaterial = {};
+            if (textureUrl) {
+                var texture = new THREE.ImageUtils.loadTexture(textureUrl);
+                cylinderMaterial = new THREE.MeshLambertMaterial({
+                        map: texture,
+                        side: THREE.DoubleSide
+                    }
+                );
+            }
+            else {
+                cylinderMaterial = new THREE.MeshLambertMaterial({
+                    vertexColors: color,
+                    side: THREE.DoubleSide
+                });
+            }
+
+            var cylinderMesh = new THREE.Mesh(cylinderGeometry, cylinderMaterial);
+            cylinderMesh.position.set(x, y, z);
+            cylinderMesh.castShadow = true;
+            cylinderMesh.receiveShadow = true;
+            return cylinderMesh;
         };
 
         self.createPyramid = function (x, y, z, color, textureUrl,radiusTop, radiusBottom, height, radialSegments, heightSegments) {
@@ -251,7 +250,7 @@
             var material = {};
             if (textureUrl) {
                 var texture = new THREE.ImageUtils.loadTexture(textureUrl);
-                if(textureUrl == './textures/sun-texture.jpg'){
+                if(textureUrl == './textures/sun-texture.jpg' || textureUrl == './textures/face-texture.jpg'){
                     material = new THREE.MeshBasicMaterial({
                             map: texture,
                             side: THREE.DoubleSide
@@ -271,7 +270,6 @@
             }
 
             var sphere = new THREE.Mesh(geometry, material);
-            debugger;
             sphere.position.z = z;
             sphere.position.x = x;
             sphere.position.y = y;
